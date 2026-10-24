@@ -77,7 +77,7 @@ export function Layout() {
       <a className="visually-hidden-focusable skip-link" href="#main-content">
         Skip to content
       </a>
-      {isHomepage && <BackendStatusBanner />}
+      <BackendStatusBanner />
       <header className="topbar navbar navbar-expand-lg">
         <div className="container-fluid px-3 px-lg-4">
           <Link className="navbar-brand brand" to="/" onClick={closeMenu}>
