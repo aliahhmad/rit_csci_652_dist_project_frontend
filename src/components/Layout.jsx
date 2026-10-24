@@ -8,6 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useAuth } from "../auth/context";
+import BackendStatusBanner from "./BackendStatusBanner";
 import { Loading, ResourceError } from "./UI";
 
 export function ProtectedRoute({ admin = false }) {
@@ -76,6 +77,7 @@ export function Layout() {
       <a className="visually-hidden-focusable skip-link" href="#main-content">
         Skip to content
       </a>
+      {isHomepage && <BackendStatusBanner />}
       <header className="topbar navbar navbar-expand-lg">
         <div className="container-fluid px-3 px-lg-4">
           <Link className="navbar-brand brand" to="/" onClick={closeMenu}>
