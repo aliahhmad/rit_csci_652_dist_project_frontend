@@ -131,8 +131,30 @@ export function Register() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [registrationConfig, setRegistrationConfig] = useState(null);
+  const [configError, setConfigError] = useState("");
+  const [configVersion, setConfigVersion] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    api("/registration-config/", {
+      auth: false,
+      signal: controller.signal,
+    })
+      .then((config) => {
+        if (typeof config?.referral_code_required !== "boolean")
+          throw new Error("Unable to load signup settings. Please try again.");
+        if (!controller.signal.aborted) setRegistrationConfig(config);
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) setConfigError(err.message);
+      });
+    return () => controller.abort();
+  }, [configVersion]);
+
   async function submit(event) {
     event.preventDefault();
+    if (!registrationConfig) return;
     const { confirmation, ...values } = Object.fromEntries(
       new FormData(event.currentTarget),
     );
@@ -147,6 +169,9 @@ export function Register() {
           first_name: values.first_name.trim(),
           last_name: values.last_name.trim(),
           email: values.email.trim(),
+          ...(registrationConfig.referral_code_required && {
+            referral_code: values.referral_code.trim(),
+          }),
         },
         auth: false,
       });
@@ -160,12 +185,32 @@ export function Register() {
   return (
     <AuthFrame
       title="Make yourself at home."
-      description="Create your account to get started."
+      description={
+        registrationConfig?.referral_code_required
+          ? "Have a demo invitation? Create your account with your referral code."
+          : "Create your account to get started."
+      }
       step="JOIN THE COMMUNITY"
     >
       <Alert>{error}</Alert>
+      <Alert>{configError}</Alert>
+      {configError && (
+        <button
+          type="button"
+          className="btn btn-outline-secondary mb-3"
+          onClick={() => {
+            setConfigError("");
+            setConfigVersion((version) => version + 1);
+          }}
+        >
+          Retry loading signup settings
+        </button>
+      )}
+      {!registrationConfig && !configError && (
+        <Loading label="Loading signup settings…" />
+      )}
       <form onSubmit={submit}>
-        <fieldset disabled={busy}>
+        <fieldset disabled={busy || !registrationConfig}>
           <div className="row">
             <div className="col-sm-6">
               <Field
@@ -210,6 +255,19 @@ export function Register() {
             minLength={8}
             required
           />
+          {registrationConfig?.referral_code_required && (
+            <Field
+              label="Referral code"
+              name="referral_code"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              maxLength={128}
+              pattern=".*\S.*"
+              hint="Enter the referral code shared with your demo invitation."
+              required
+            />
+          )}
           <Submit busy={busy} className="btn-primary w-100 mt-2">
             Create account <span aria-hidden="true">→</span>
           </Submit>
