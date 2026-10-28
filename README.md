@@ -179,6 +179,11 @@ or provide a separate reverse proxy when testing the production build.
    frontend address, then confirm the backend is reachable before testing login
    and request actions.
 
+For the backend demo deployment in `api/deploy/demo/README.md`, use
+`VITE_API_BASE_URL=https://api-demo.example.com/api` with your actual backend
+hostname. The `/api` prefix is supplied by that deployment's HTTPS proxy.
+Deploy only the backend repository to the server; this frontend stays on Vercel.
+
 This setup calls the backend URL directly. Vite's `server.proxy` does not run
 on Vercel. Leaving `VITE_API_BASE_URL` blank on a static deployment requires a
 separate `/api` reverse proxy; the SPA fallback above is not an API proxy.
