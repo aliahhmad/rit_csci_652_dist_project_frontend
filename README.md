@@ -91,7 +91,7 @@ Configure these in the backend environment:
 
 | Setting        | Value                                                                                                                                 |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `CORS_ORIGINS` | The allowed frontend origin, such as `http://localhost:5173` or `https://your-site.vercel.app`; separate multiple origins with commas |
+| `CORS_ORIGINS` | The allowed frontend origin, such as `http://localhost:5173` or `https://frontend.example.com`; separate multiple origins with commas |
 | `FRONTEND_URL` | The frontend website address used in verification and password-reset emails                                                           |
 
 Restart the backend after updating its environment. With Docker Compose,
@@ -149,47 +149,9 @@ Run lint and build before deployment. Preview serves the built frontend; it
 does not provide the development `/api` proxy. Build with a reachable API URL
 or provide a separate reverse proxy when testing the production build.
 
-## Deploy to Vercel
+## Deployment
 
-1. Import the frontend repository. Set **Root Directory** to the directory
-   containing this README and `package.json`: the repository root for a
-   frontend-only repository, or `frontend` if importing the parent project.
-2. Use the following build settings:
-
-   | Setting          | Value           |
-   | ---------------- | --------------- |
-   | Framework preset | Vite            |
-   | Node.js version  | 24.x            |
-   | Install command  | `npm ci`        |
-   | Build command    | `npm run build` |
-   | Output directory | `dist`          |
-
-3. Add `VITE_API_BASE_URL` with the public HTTPS Campus API address to each
-   deployment environment you will use, such as Production and Preview.
-   A local `.env.local` file is not uploaded through Git. Changes require a
-   new deployment. See [Vercel environment variables](https://vercel.com/docs/environment-variables/managing-environment-variables).
-4. Keep the included [vercel.json](vercel.json) next to `package.json`. Its SPA
-   fallback lets direct visits and refreshes on paths such as `/requests/3` load the React application
-   instead of returning a hosting 404. See [Vercel's Vite routing guide](https://vercel.com/docs/frameworks/frontend/vite#using-vite-to-make-spas).
-
-   Commit and deploy this file with the frontend. Existing deployments need a
-   new deployment for the routing change to take effect.
-
-5. Configure the backend's `CORS_ORIGINS` and `FRONTEND_URL` for the deployed
-   frontend address, then confirm the backend is reachable before testing login
-   and request actions.
-
-For the backend demo deployment in `api/deploy/demo/README.md`, use
-`VITE_API_BASE_URL=https://api-demo.example.com/api` with your actual backend
-hostname. The `/api` prefix is supplied by that deployment's HTTPS proxy.
-Deploy only the backend repository to the server; this frontend stays on Vercel.
-
-This setup calls the backend URL directly. Vite's `server.proxy` does not run
-on Vercel. Leaving `VITE_API_BASE_URL` blank on a static deployment requires a
-separate `/api` reverse proxy; the SPA fallback above is not an API proxy.
-
-For another static host, publish `dist/` and configure the equivalent fallback
-to `index.html` for application routes.
+Hosting-specific setup and deployment procedures are maintained privately.
 
 ## Troubleshooting
 
